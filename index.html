@@ -1,330 +1,1789 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+
 <title>Tradutor do Culto</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f4f4f6;color:#171717;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:700px;margin:auto;padding:18px 14px 35px}
-header{text-align:center;padding:10px 5px 18px}
-h1{margin:0;font-size:29px}.sub{color:#777;margin-top:5px}
-.card{background:#fff;border-radius:22px;padding:18px;margin:12px 0;box-shadow:0 3px 15px #0001}
-.status{font-weight:700;margin-bottom:14px}
-.dot{display:inline-block;width:11px;height:11px;border-radius:50%;background:#aaa;margin-right:7px}
-.on{background:#20a36a}
-.buttons{display:flex;gap:9px}
-button{flex:1;border:0;border-radius:15px;padding:15px;font-size:17px;font-weight:700}
-.start{background:#111;color:#fff}.stop{background:#c62828;color:#fff}.clear{background:#eee}
-.label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#777;font-weight:800;margin-bottom:9px}
-.live{font-size:25px;line-height:1.45;min-height:130px}
-.original{color:#777;line-height:1.5;min-height:50px}
-.summary{font-size:18px;line-height:1.55}
-.small{font-size:13px;color:#666;line-height:1.45}
+
+:root{
+--bg:#f5f5f7;
+--card:#ffffff;
+--text:#171717;
+--muted:#707070;
+--line:#e8e8ec;
+--accent:#111111;
+--ok:#17845b;
+--danger:#c62828;
+}
+
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+background:var(--bg);
+color:var(--text);
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+main{
+max-width:760px;
+margin:auto;
+padding:14px 14px 40px;
+}
+
+header{
+text-align:center;
+padding:10px 5px 16px;
+}
+
+h1{
+margin:0;
+font-size:29px;
+}
+
+.sub{
+color:var(--muted);
+margin-top:5px;
+}
+
+.card{
+background:var(--card);
+border-radius:22px;
+padding:18px;
+margin:12px 0;
+box-shadow:0 3px 16px #0000000c;
+}
+
+.row{
+display:flex;
+gap:9px;
+align-items:center;
+}
+
+.row>*{
+flex:1;
+}
+
+.status{
+font-weight:750;
+margin-bottom:13px;
+}
+
+.dot{
+display:inline-block;
+width:11px;
+height:11px;
+border-radius:50%;
+background:#aaa;
+margin-right:7px;
+}
+
+.dot.on{
+background:var(--ok);
+}
+
+button{
+border:0;
+border-radius:15px;
+padding:14px 12px;
+font-size:16px;
+font-weight:750;
+min-height:50px;
+}
+
+.start{
+background:#111;
+color:#fff;
+}
+
+.stop{
+background:var(--danger);
+color:#fff;
+}
+
+.secondary{
+background:#eee;
+color:#222;
+}
+
+button:disabled{
+opacity:.45;
+}
+
+.label{
+font-size:11px;
+letter-spacing:.11em;
+text-transform:uppercase;
+color:var(--muted);
+font-weight:850;
+margin-bottom:9px;
+}
+
+.live{
+font-size:25px;
+line-height:1.45;
+min-height:130px;
+white-space:pre-wrap;
+}
+
+.interim{
+opacity:.55;
+}
+
+.original{
+color:#606060;
+line-height:1.55;
+min-height:65px;
+white-space:pre-wrap;
+}
+
+.summary{
+font-size:18px;
+line-height:1.58;
+}
+
+.summary ul{
+padding-left:22px;
+}
+
+.small{
+font-size:13px;
+color:var(--muted);
+line-height:1.45;
+}
+
+.controls{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+margin-top:10px;
+}
+
+.controls button{
+flex:1;
+min-width:115px;
+}
+
+.pill{
+display:inline-block;
+background:#f0f0f2;
+border-radius:999px;
+padding:7px 10px;
+font-size:12px;
+color:#666;
+}
+
+.warn{
+background:#fff7e6;
+border:1px solid #f1d79c;
+color:#72520b;
+border-radius:14px;
+padding:11px;
+font-size:13px;
+line-height:1.4;
+margin-top:12px;
+}
+
+.ok{
+background:#eaf8f1;
+border:1px solid #bfe5d0;
+color:#126443;
+border-radius:14px;
+padding:11px;
+font-size:13px;
+line-height:1.4;
+margin-top:12px;
+}
+
+#history{
+max-height:300px;
+overflow:auto;
+border-top:1px solid var(--line);
+margin-top:10px;
+padding-top:10px;
+}
+
+.segment{
+padding:10px 0;
+border-bottom:1px solid var(--line);
+}
+
+.segment:last-child{
+border-bottom:0;
+}
+
+.segment .es{
+font-size:14px;
+color:#777;
+}
+
+.segment .pt{
+font-size:17px;
+margin-top:3px;
+}
+
+details summary{
+font-weight:750;
+cursor:pointer;
+}
+
 </style>
 </head>
 
+
 <body>
+
 <main>
 
 <header>
+
 <h1>🎙️ Tradutor do Culto</h1>
-<div class="sub">Castelhano → Português</div>
+
+<div class="sub">
+Castelhano → Português • tradução ao vivo
+</div>
+
 </header>
 
+
+<!-- CONTROLES -->
+
 <section class="card">
+
 <div class="status">
+
 <span id="dot" class="dot"></span>
-<span id="status">Pronto para começar</span>
+
+<span id="status">
+Pronto para começar
+</span>
+
 </div>
 
-<div class="buttons">
-<button id="start" class="start">▶ Iniciar</button>
-<button id="stop" class="stop" disabled>■ Parar</button>
-<button id="clear" class="clear">Limpar</button>
+
+<div class="row">
+
+<button
+id="start"
+class="start">
+▶ Iniciar
+</button>
+
+
+<button
+id="stop"
+class="stop"
+disabled>
+■ Parar
+</button>
+
 </div>
+
+
+<div class="controls">
+
+<button
+id="clear"
+class="secondary">
+Limpar
+</button>
+
+
+<button
+id="copy"
+class="secondary">
+Copiar tradução
+</button>
+
+
+<button
+id="download"
+class="secondary">
+Salvar resumo
+</button>
+
+</div>
+
+
+<div
+style="
+margin-top:12px;
+display:flex;
+gap:7px;
+flex-wrap:wrap;
+">
+
+<span
+class="pill"
+id="timer">
+00:00
+</span>
+
+<span class="pill">
+🇪🇸 es-PY
+</span>
+
+<span class="pill">
+🇧🇷 pt-BR
+</span>
+
+</div>
+
+
+<div id="message"></div>
+
+</section>
+
+
+
+<!-- TRADUÇÃO -->
+
+<section class="card">
+
+<div class="label">
+🇧🇷 Tradução em tempo real
+</div>
+
+
+<div
+id="pt"
+class="live">
+
+A tradução aparecerá aqui…
+
+</div>
+
+
+<div
+id="ptInterim"
+class="live interim">
+</div>
+
+</section>
+
+
+
+<!-- ORIGINAL -->
+
+<section class="card">
+
+<div class="label">
+🇪🇸 O que está sendo reconhecido
+</div>
+
+
+<div
+id="es"
+class="original">
+
+O áudio reconhecido aparecerá aqui…
+
+</div>
+
+</section>
+
+
+
+<!-- RESUMO -->
+
+<section class="card">
+
+<div class="label">
+📖 Resumo da mensagem
+</div>
+
+
+<div
+id="summary"
+class="summary">
+
+O resumo será atualizado conforme a pregação avança.
+
+</div>
+
+</section>
+
+
+
+<!-- HISTÓRICO -->
+
+<section class="card">
+
+<details>
+
+<summary>
+Ver histórico da tradução
+</summary>
+
+
+<div id="history"></div>
+
+</details>
+
+</section>
+
+
+
+<!-- INSTRUÇÕES -->
+
+<section class="card">
+
+<details>
+
+<summary>
+Como usar no culto
+</summary>
+
 
 <p class="small">
-Toque em Iniciar e permita o acesso ao microfone.
+
+1. Coloque o iPhone perto da fonte do áudio.
+
+<br><br>
+
+2. Toque em <b>Iniciar</b>.
+
+<br><br>
+
+3. Permita o acesso ao microfone.
+
+<br><br>
+
+4. Deixe o Safari aberto durante a pregação.
+
+<br><br>
+
+5. A tradução provisória aparecerá enquanto a frase está sendo reconhecida.
+
+<br><br>
+
+6. Quando a frase terminar, ela será adicionada à tradução definitiva.
+
+<br><br>
+
+7. No final, use <b>Salvar resumo</b>.
+
 </p>
+
+</details>
+
 </section>
 
-<section class="card">
-<div class="label">🇧🇷 Tradução em português</div>
-<div id="pt" class="live">
-A tradução aparecerá aqui...
-</div>
-</section>
 
-<section class="card">
-<div class="label">🇪🇸 Castelhano reconhecido</div>
-<div id="es" class="original">
-O que o pastor falar aparecerá aqui...
-</div>
-</section>
+</main>
 
-<section class="card">
-<div class="label">📖 Resumo da mensagem</div>
-<div id="summary" class="summary">
-O resumo será formado conforme a pregação avança.
-</div>
-</section>
+
 
 <script>
-const SpeechRecognition=
-window.SpeechRecognition||window.webkitSpeechRecognition;
 
-let recognition;
-let running=false;
-let originalText="";
-let portugueseText=[];
 
-const start=document.getElementById("start");
-const stop=document.getElementById("stop");
-const clear=document.getElementById("clear");
-const pt=document.getElementById("pt");
-const es=document.getElementById("es");
-const summary=document.getElementById("summary");
-const status=document.getElementById("status");
-const dot=document.getElementById("dot");
+/* =====================================================
+   ELEMENTOS
+===================================================== */
 
-function setStatus(text,on=false){
-status.textContent=text;
-dot.className=on?"dot on":"dot";
+const SpeechRecognition =
+window.SpeechRecognition ||
+window.webkitSpeechRecognition;
+
+
+const $ = id =>
+document.getElementById(id);
+
+
+const start =
+$("start");
+
+
+const stop =
+$("stop");
+
+
+const clear =
+$("clear");
+
+
+const copy =
+$("copy");
+
+
+const download =
+$("download");
+
+
+const pt =
+$("pt");
+
+
+const ptInterim =
+$("ptInterim");
+
+
+const es =
+$("es");
+
+
+const summary =
+$("summary");
+
+
+const history =
+$("history");
+
+
+const status =
+$("status");
+
+
+const dot =
+$("dot");
+
+
+const message =
+$("message");
+
+
+const timer =
+$("timer");
+
+
+
+/* =====================================================
+   VARIÁVEIS
+===================================================== */
+
+let recognition = null;
+
+let running = false;
+
+let startedAt = 0;
+
+let timerId = null;
+
+let finalSpanish = "";
+
+let finalPortuguese = "";
+
+let segments = [];
+
+let lastInterim = "";
+
+let translationNumber = 0;
+
+let interimTimer = null;
+
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function setStatus(text, active=false){
+
+status.textContent = text;
+
+dot.className =
+active
+? "dot on"
+: "dot";
+
 }
 
-async function translate(text){
+
+
+/* =====================================================
+   MENSAGENS
+===================================================== */
+
+function notify(text,type="ok"){
+
+message.innerHTML =
+'<div class="' +
+(type === "warn" ? "warn" : "ok") +
+'">' +
+escapeHTML(text) +
+'</div>';
+
+}
+
+
+/* =====================================================
+   SEGURANÇA HTML
+===================================================== */
+
+function escapeHTML(text){
+
+return String(text).replace(
+/[&<>"']/g,
+function(character){
+
+return {
+
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
+
+}[character];
+
+});
+
+}
+
+
+
+/* =====================================================
+   CRONÔMETRO
+===================================================== */
+
+function updateTimer(){
+
+if(!startedAt){
+
+return;
+
+}
+
+const seconds =
+Math.floor(
+(Date.now()-startedAt)/1000
+);
+
+
+const minutes =
+Math.floor(seconds/60);
+
+
+const remaining =
+seconds%60;
+
+
+timer.textContent =
+String(minutes).padStart(2,"0") +
+":" +
+String(remaining).padStart(2,"0");
+
+}
+
+
+
+/* =====================================================
+   RENDERIZAÇÃO
+===================================================== */
+
+function render(){
+
+pt.textContent =
+finalPortuguese ||
+"A tradução aparecerá aqui…";
+
+
+es.textContent =
+finalSpanish ||
+"O áudio reconhecido aparecerá aqui…";
+
+
+history.innerHTML =
+segments.map(function(segment){
+
+return (
+
+'<div class="segment">' +
+
+'<div class="es">' +
+escapeHTML(segment.es) +
+'</div>' +
+
+'<div class="pt">' +
+escapeHTML(segment.pt) +
+'</div>' +
+
+'</div>'
+
+);
+
+}).join("");
+
+
+history.scrollTop =
+history.scrollHeight;
+
+
+updateSummary();
+
+}
+
+
+
+/* =====================================================
+   RESUMO
+===================================================== */
+
+function updateSummary(){
+
+const text =
+finalPortuguese.trim();
+
+
+if(!text){
+
+summary.textContent =
+"O resumo será atualizado conforme a pregação avança.";
+
+return;
+
+}
+
+
+const sentences =
+text
+.split(/(?<=[.!?])\s+/)
+.map(function(sentence){
+
+return sentence.trim();
+
+})
+.filter(function(sentence){
+
+return sentence.length > 35;
+
+});
+
+
+const topics = [
+
+"Deus",
+"Jesus",
+"Cristo",
+"fé",
+"oração",
+"igreja",
+"família",
+"amor",
+"graça",
+"salvação",
+"palavra",
+"Espírito Santo",
+"esperança",
+"perdão",
+"pecado",
+"Bíblia",
+"vida",
+"propósito"
+
+];
+
+
+const lower =
+text.toLowerCase();
+
+
+const found =
+topics.filter(function(topic){
+
+return lower.includes(
+topic.toLowerCase()
+);
+
+});
+
+
+let html = "";
+
+
+if(found.length){
+
+html +=
+"<p><b>Temas identificados:</b> " +
+escapeHTML(found.join(", ")) +
+".</p>";
+
+}
+
+
+if(sentences.length){
+
+html +=
+"<b>Principais ideias registradas:</b><ul>";
+
+
+sentences
+.slice(-6)
+.forEach(function(sentence){
+
+html +=
+"<li>" +
+escapeHTML(sentence) +
+"</li>";
+
+});
+
+
+html += "</ul>";
+
+}
+
+else{
+
+html +=
+"<p>" +
+escapeHTML(
+text.slice(-700)
+) +
+"</p>";
+
+}
+
+
+summary.innerHTML =
+html;
+
+}
+
+
+
+/* =====================================================
+   TRADUÇÃO
+===================================================== */
+
+async function translateText(text){
+
+const query =
+text.trim();
+
+
+if(!query){
+
+return "";
+
+}
+
+
+/*
+ Serviço de tradução.
+ Castelhano → Português.
+*/
+
+const url =
+"https://api.mymemory.translated.net/get?q=" +
+encodeURIComponent(query) +
+"&langpair=es|pt-BR";
+
+
+const response =
+await fetch(
+url,
+{
+headers:{
+"Accept":
+"application/json"
+}
+}
+);
+
+
+if(!response.ok){
+
+throw new Error(
+"Erro na tradução"
+);
+
+}
+
+
+const data =
+await response.json();
+
+
+const translated =
+data &&
+data.responseData &&
+data.responseData.translatedText;
+
+
+if(!translated){
+
+throw new Error(
+"Tradução vazia"
+);
+
+}
+
+
+return translated;
+
+}
+
+
+
+/* =====================================================
+   TRADUZIR FRASE FINAL
+===================================================== */
+
+async function translateFinal(text){
+
+const id =
+++translationNumber;
+
 
 try{
 
-const url=
-"https://api.mymemory.translated.net/get?q="+
-encodeURIComponent(text)+
-"&langpair=es|pt-BR";
-
-const response=await fetch(url);
-const data=await response.json();
-
-return data.responseData.translatedText||text;
-
-}catch(error){
-
-return text;
-
-}
-
-}
-
-function makeSummary(){
-
-if(!portugueseText.length)return;
-
-const text=portugueseText.join(" ");
-
-const sentences=text
-.split(/[.!?]+/)
-.map(x=>x.trim())
-.filter(x=>x.length>30);
-
-const topics=[
-"Deus","Jesus","Cristo","fé","oração",
-"igreja","família","amor","graça",
-"salvação","palavra","Espírito Santo"
-];
-
-const found=topics.filter(x=>
-text.toLowerCase().includes(x.toLowerCase())
+setStatus(
+"Traduzindo…",
+true
 );
 
-let html="";
 
-if(found.length){
-html+="<strong>Assuntos principais:</strong><p>"+
-found.join(", ")+"</p>";
+const translated =
+await translateText(text);
+
+
+if(id !== translationNumber){
+
+return;
+
 }
 
-html+="<strong>Principais pontos:</strong><ul>";
 
-sentences.slice(-5).forEach(x=>{
-html+="<li>"+x+"</li>";
+finalPortuguese +=
+(finalPortuguese ? " " : "") +
+translated;
+
+
+segments.push({
+
+es:text,
+
+pt:translated
+
 });
 
-html+="</ul>";
 
-summary.innerHTML=html;
+render();
 
-}
-
-async function processSpeech(text){
-
-if(!text)return;
-
-originalText+=" "+text;
-
-es.textContent=originalText.trim();
-
-setStatus("Traduzindo…",true);
-
-const translated=await translate(text);
-
-portugueseText.push(translated);
-
-pt.textContent=portugueseText.join(" ");
-
-makeSummary();
-
-if(running)setStatus("Ouvindo o culto…",true);
-
-}
-
-if(!SpeechRecognition){
-
-setStatus("Reconhecimento não disponível");
-
-start.disabled=true;
-
-}else{
-
-recognition=new SpeechRecognition();
-
-recognition.lang="es-PY";
-recognition.continuous=true;
-recognition.interimResults=true;
-
-recognition.onstart=function(){
-
-setStatus("Ouvindo o culto…",true);
-
-};
-
-recognition.onresult=async function(event){
-
-let interim="";
-
-for(
-let i=event.resultIndex;
-i<event.results.length;
-i++
-){
-
-const text=
-event.results[i][0].transcript;
-
-if(event.results[i].isFinal){
-
-await processSpeech(text);
-
-}else{
-
-interim+=text;
-
-}
-
-}
-
-if(interim){
-
-es.textContent=
-(originalText+" "+interim).trim();
-
-pt.textContent=
-"Ouvindo: "+interim;
-
-}
-
-};
-
-recognition.onerror=function(event){
-
-setStatus("Erro: "+event.error);
-
-};
-
-recognition.onend=function(){
 
 if(running){
 
-setTimeout(function(){
+setStatus(
+"Ouvindo o culto…",
+true
+);
+
+}
+
+
+}
+
+catch(error){
+
+/*
+ Se o serviço de tradução falhar,
+ não perde o texto.
+*/
+
+finalPortuguese +=
+(finalPortuguese ? " " : "") +
+text;
+
+
+segments.push({
+
+es:text,
+
+pt:text
+
+});
+
+
+render();
+
+
+notify(
+"A tradução ficou indisponível neste trecho. O texto original foi mantido.",
+"warn"
+);
+
+
+if(running){
+
+setStatus(
+"Ouvindo o culto…",
+true
+);
+
+}
+
+}
+
+}
+
+
+
+/* =====================================================
+   TRADUÇÃO PROVISÓRIA
+===================================================== */
+
+async function translateInterim(text){
+
+if(!text){
+
+ptInterim.textContent =
+"";
+
+return;
+
+}
+
+
+if(text === lastInterim){
+
+return;
+
+}
+
+
+lastInterim =
+text;
+
+
+const id =
+++translationNumber;
+
 
 try{
-recognition.start();
-}catch(e){}
 
-},300);
+const translated =
+await translateText(text);
+
+
+if(id !== translationNumber){
+
+return;
+
+}
+
+
+ptInterim.textContent =
+translated;
+
+}
+
+catch(error){
+
+/*
+ Não mostra erro durante
+ cada pequeno trecho.
+*/
+
+ptInterim.textContent =
+"…";
+
+}
+
+}
+
+
+
+/* =====================================================
+   AGENDAR TRADUÇÃO INTERMEDIÁRIA
+===================================================== */
+
+function scheduleInterim(text){
+
+clearTimeout(
+interimTimer
+);
+
+
+if(!text){
+
+ptInterim.textContent =
+"";
+
+return;
+
+}
+
+
+interimTimer =
+setTimeout(
+function(){
+
+translateInterim(text);
+
+},
+500
+);
+
+}
+
+
+
+/* =====================================================
+   INICIAR RECONHECIMENTO
+===================================================== */
+
+function startRecognition(){
+
+if(!SpeechRecognition){
+
+notify(
+"Seu navegador não oferece reconhecimento de voz compatível. Abra este site no Safari do iPhone.",
+"warn"
+);
+
+return;
+
+}
+
+
+if(running){
+
+return;
+
+}
+
+
+running =
+true;
+
+
+startedAt =
+Date.now();
+
+
+timerId =
+setInterval(
+updateTimer,
+1000
+);
+
+
+start.disabled =
+true;
+
+
+stop.disabled =
+false;
+
+
+setStatus(
+"Ouvindo o culto…",
+true
+);
+
+
+notify(
+"Microfone ativo. Ouvindo o culto."
+);
+
+
+/*
+ Criamos uma nova instância.
+*/
+
+recognition =
+new SpeechRecognition();
+
+
+/*
+ Espanhol do Paraguai.
+*/
+
+recognition.lang =
+"es-PY";
+
+
+/*
+ Continua ouvindo.
+*/
+
+recognition.continuous =
+true;
+
+
+/*
+ Permite resultados provisórios.
+*/
+
+recognition.interimResults =
+true;
+
+
+recognition.maxAlternatives =
+1;
+
+
+
+/* =====================================================
+   QUANDO COMEÇA
+===================================================== */
+
+recognition.onstart =
+function(){
+
+setStatus(
+"Ouvindo o culto…",
+true
+);
+
+};
+
+
+
+/* =====================================================
+   RESULTADOS
+===================================================== */
+
+recognition.onresult =
+async function(event){
+
+let interim = "";
+
+
+for(
+let i = event.resultIndex;
+i < event.results.length;
+i++
+){
+
+const result =
+event.results[i];
+
+
+const text =
+result[0]
+.transcript
+.trim();
+
+
+if(!text){
+
+continue;
+
+}
+
+
+/*
+ FRASE DEFINITIVA
+*/
+
+if(result.isFinal){
+
+finalSpanish +=
+(finalSpanish ? " " : "") +
+text;
+
+
+es.textContent =
+finalSpanish;
+
+
+ptInterim.textContent =
+"";
+
+
+await translateFinal(
+text
+);
+
+}
+
+
+/*
+ FRASE PROVISÓRIA
+*/
+
+else{
+
+interim +=
+(interim ? " " : "") +
+text;
+
+}
+
+}
+
+
+/*
+ Atualiza o castelhano
+ enquanto a pessoa fala.
+*/
+
+if(interim){
+
+es.textContent =
+(
+finalSpanish +
+" " +
+interim
+).trim();
+
+
+/*
+ Tradução provisória.
+*/
+
+scheduleInterim(
+interim
+);
+
+}
+
+else{
+
+ptInterim.textContent =
+"";
 
 }
 
 };
 
+
+
+/* =====================================================
+   ERRO
+===================================================== */
+
+recognition.onerror =
+function(event){
+
+console.log(
+"SpeechRecognition error:",
+event.error
+);
+
+
+if(
+event.error ===
+"not-allowed"
+){
+
+notify(
+"O microfone foi bloqueado. Permita o microfone para este site nas configurações do Safari.",
+"warn"
+);
+
+
+stopRecognition();
+
+return;
+
 }
 
-start.onclick=function(){
 
-if(!recognition)return;
+if(
+event.error ===
+"service-not-allowed"
+){
 
-running=true;
+notify(
+"O reconhecimento de voz não foi permitido pelo navegador.",
+"warn"
+);
 
-start.disabled=true;
-stop.disabled=false;
+
+stopRecognition();
+
+return;
+
+}
+
+
+if(
+event.error ===
+"network"
+){
+
+notify(
+"Problema de conexão. Tentando continuar.",
+"warn"
+);
+
+return;
+
+}
+
+
+if(
+event.error !==
+"aborted"
+){
+
+setStatus(
+"Reconectando…",
+true
+);
+
+}
+
+};
+
+
+
+/* =====================================================
+   QUANDO O RECONHECIMENTO TERMINA
+===================================================== */
+
+recognition.onend =
+function(){
+
+/*
+ Safari pode encerrar o reconhecimento.
+ Se ainda estamos no culto,
+ inicia novamente.
+*/
+
+if(running){
+
+setTimeout(
+function(){
+
+if(!running){
+
+return;
+
+}
+
 
 try{
 
 recognition.start();
 
-}catch(e){
+}
 
-setStatus("Toque novamente em Iniciar");
+catch(error){
+
+console.log(
+"Reconhecimento já iniciado."
+);
+
+}
+
+},
+400
+);
 
 }
 
 };
 
-stop.onclick=function(){
 
-running=false;
 
-if(recognition)recognition.stop();
+/* =====================================================
+   COMEÇAR
+===================================================== */
 
-start.disabled=false;
-stop.disabled=true;
+try{
 
-setStatus("Tradução parada");
+recognition.start();
 
-makeSummary();
+}
 
-};
+catch(error){
 
-clear.onclick=function(){
+console.log(error);
 
-running=false;
+setStatus(
+"Toque em Iniciar novamente"
+);
+
+}
+
+}
+
+
+
+/* =====================================================
+   PARAR
+===================================================== */
+
+function stopRecognition(){
+
+running =
+false;
+
 
 if(recognition){
 
 try{
+
 recognition.stop();
-}catch(e){}
 
 }
 
-originalText="";
-portugueseText=[];
+catch(error){
 
-pt.textContent="A tradução aparecerá aqui...";
-es.textContent="O que o pastor falar aparecerá aqui...";
+console.log(error);
 
-summary.textContent=
-"O resumo será formado conforme a pregação avança.";
+}
 
-start.disabled=false;
-stop.disabled=true;
+}
 
-setStatus("Pronto para começar");
+
+recognition =
+null;
+
+
+start.disabled =
+false;
+
+
+stop.disabled =
+true;
+
+
+clearInterval(
+timerId
+);
+
+
+timerId =
+null;
+
+
+clearTimeout(
+interimTimer
+);
+
+
+ptInterim.textContent =
+"";
+
+
+setStatus(
+"Tradução parada"
+);
+
+
+render();
+
+}
+
+
+
+/* =====================================================
+   BOTÃO INICIAR
+===================================================== */
+
+start.onclick =
+function(){
+
+startRecognition();
 
 };
 
+
+
+/* =====================================================
+   BOTÃO PARAR
+===================================================== */
+
+stop.onclick =
+function(){
+
+stopRecognition();
+
+};
+
+
+
+/* =====================================================
+   BOTÃO LIMPAR
+===================================================== */
+
+clear.onclick =
+function(){
+
+stopRecognition();
+
+
+finalSpanish =
+"";
+
+
+finalPortuguese =
+"";
+
+
+segments =
+[];
+
+
+lastInterim =
+"";
+
+
+ptInterim.textContent =
+"";
+
+
+message.innerHTML =
+"";
+
+
+timer.textContent =
+"00:00";
+
+
+startedAt =
+0;
+
+
+render();
+
+
+setStatus(
+"Pronto para começar"
+);
+
+};
+
+
+
+/* =====================================================
+   COPIAR TRADUÇÃO
+===================================================== */
+
+copy.onclick =
+async function(){
+
+const text =
+finalPortuguese.trim();
+
+
+if(!text){
+
+notify(
+"Ainda não existe tradução para copiar.",
+"warn"
+);
+
+return;
+
+}
+
+
+try{
+
+await navigator.clipboard.writeText(
+text
+);
+
+
+notify(
+"Tradução copiada."
+);
+
+}
+
+catch(error){
+
+notify(
+"Não foi possível copiar automaticamente.",
+"warn"
+);
+
+}
+
+};
+
+
+
+/* =====================================================
+   SALVAR RESUMO
+===================================================== */
+
+download.onclick =
+function(){
+
+const content =
+"RESUMO DO CULTO\n\n" +
+summary.innerText +
+"\n\n\n" +
+"TRADUÇÃO COMPLETA\n\n" +
+finalPortuguese;
+
+
+const blob =
+new Blob(
+[content],
+{
+type:
+"text/plain;charset=utf-8"
+}
+);
+
+
+const url =
+URL.createObjectURL(
+blob
+);
+
+
+const link =
+document.createElement("a");
+
+
+link.href =
+url;
+
+
+link.download =
+"resumo-do-culto.txt";
+
+
+document.body.appendChild(
+link
+);
+
+
+link.click();
+
+
+document.body.removeChild(
+link
+);
+
+
+setTimeout(
+function(){
+
+URL.revokeObjectURL(
+url
+);
+
+},
+1000
+);
+
+};
+
+
+
+/* =====================================================
+   VERIFICAÇÃO INICIAL
+===================================================== */
+
+if(!SpeechRecognition){
+
+notify(
+"⚠️ O reconhecimento de voz não está disponível neste navegador. Use o Safari no iPhone.",
+"warn"
+);
+
+}
+
+
+render();
+
 </script>
 
-</main>
 </body>
 </html>
