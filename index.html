@@ -1,1 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tradutor do Culto</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f4f6;color:#171717;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:700px;margin:auto;padding:18px 14px 35px}
+header{text-align:center;padding:10px 5px 18px}
+h1{margin:0;font-size:29px}.sub{color:#777;margin-top:5px}
+.card{background:#fff;border-radius:22px;padding:18px;margin:12px 0;box-shadow:0 3px 15px #0001}
+.status{font-weight:700;margin-bottom:14px}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;background:#aaa;margin-right:7px}
+.on{background:#20a36a}
+.buttons{display:flex;gap:9px}
+button{flex:1;border:0;border-radius:15px;padding:15px;font-size:17px;font-weight:700}
+.start{background:#111;color:#fff}.stop{background:#c62828;color:#fff}.clear{background:#eee}
+.label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#777;font-weight:800;margin-bottom:9px}
+.live{font-size:25px;line-height:1.45;min-height:130px}
+.original{color:#777;line-height:1.5;min-height:50px}
+.summary{font-size:18px;line-height:1.55}
+.small{font-size:13px;color:#666;line-height:1.45}
+</style>
+</head>
 
+<body>
+<main>
+
+<header>
+<h1>🎙️ Tradutor do Culto</h1>
+<div class="sub">Castelhano → Português</div>
+</header>
+
+<section class="card">
+<div class="status">
+<span id="dot" class="dot"></span>
+<span id="status">Pronto para começar</span>
+</div>
+
+<div class="buttons">
+<button id="start" class="start">▶ Iniciar</button>
+<button id="stop" class="stop" disabled>■ Parar</button>
+<button id="clear" class="clear">Limpar</button>
+</div>
+
+<p class="small">
+Toque em Iniciar e permita o acesso ao microfone.
+</p>
+</section>
+
+<section class="card">
+<div class="label">🇧🇷 Tradução em português</div>
+<div id="pt" class="live">
+A tradução aparecerá aqui...
+</div>
+</section>
+
+<section class="card">
+<div class="label">🇪🇸 Castelhano reconhecido</div>
+<div id="es" class="original">
+O que o pastor falar aparecerá aqui...
+</div>
+</section>
+
+<section class="card">
+<div class="label">📖 Resumo da mensagem</div>
+<div id="summary" class="summary">
+O resumo será formado conforme a pregação avança.
+</div>
+</section>
+
+<script>
+const SpeechRecognition=
+window.SpeechRecognition||window.webkitSpeechRecognition;
+
+let recognition;
+let running=false;
+let originalText="";
+let portugueseText=[];
+
+const start=document.getElementById("start");
+const stop=document.getElementById("stop");
+const clear=document.getElementById("clear");
+const pt=document.getElementById("pt");
+const es=document.getElementById("es");
+const summary=document.getElementById("summary");
+const status=document.getElementById("status");
+const dot=document.getElementById("dot");
+
+function setStatus(text,on=false){
+status.textContent=text;
+dot.className=on?"dot on":"dot";
+}
+
+async function translate(text){
+
+try{
+
+const url=
+"https://api.mymemory.translated.net/get?q="+
+encodeURIComponent(text)+
+"&langpair=es|pt-BR";
+
+const response=await fetch(url);
+const data=await response.json();
+
+return data.responseData.translatedText||text;
+
+}catch(error){
+
+return text;
+
+}
+
+}
+
+function makeSummary(){
+
+if(!portugueseText.length)return;
+
+const text=portugueseText.join(" ");
+
+const sentences=text
+.split(/[.!?]+/)
+.map(x=>x.trim())
+.filter(x=>x.length>30);
+
+const topics=[
+"Deus","Jesus","Cristo","fé","oração",
+"igreja","família","amor","graça",
+"salvação","palavra","Espírito Santo"
+];
+
+const found=topics.filter(x=>
+text.toLowerCase().includes(x.toLowerCase())
+);
+
+let html="";
+
+if(found.length){
+html+="<strong>Assuntos principais:</strong><p>"+
+found.join(", ")+"</p>";
+}
+
+html+="<strong>Principais pontos:</strong><ul>";
+
+sentences.slice(-5).forEach(x=>{
+html+="<li>"+x+"</li>";
+});
+
+html+="</ul>";
+
+summary.innerHTML=html;
+
+}
+
+async function processSpeech(text){
+
+if(!text)return;
+
+originalText+=" "+text;
+
+es.textContent=originalText.trim();
+
+setStatus("Traduzindo…",true);
+
+const translated=await translate(text);
+
+portugueseText.push(translated);
+
+pt.textContent=portugueseText.join(" ");
+
+makeSummary();
+
+if(running)setStatus("Ouvindo o culto…",true);
+
+}
+
+if(!SpeechRecognition){
+
+setStatus("Reconhecimento não disponível");
+
+start.disabled=true;
+
+}else{
+
+recognition=new SpeechRecognition();
+
+recognition.lang="es-PY";
+recognition.continuous=true;
+recognition.interimResults=true;
+
+recognition.onstart=function(){
+
+setStatus("Ouvindo o culto…",true);
+
+};
+
+recognition.onresult=async function(event){
+
+let interim="";
+
+for(
+let i=event.resultIndex;
+i<event.results.length;
+i++
+){
+
+const text=
+event.results[i][0].transcript;
+
+if(event.results[i].isFinal){
+
+await processSpeech(text);
+
+}else{
+
+interim+=text;
+
+}
+
+}
+
+if(interim){
+
+es.textContent=
+(originalText+" "+interim).trim();
+
+pt.textContent=
+"Ouvindo: "+interim;
+
+}
+
+};
+
+recognition.onerror=function(event){
+
+setStatus("Erro: "+event.error);
+
+};
+
+recognition.onend=function(){
+
+if(running){
+
+setTimeout(function(){
+
+try{
+recognition.start();
+}catch(e){}
+
+},300);
+
+}
+
+};
+
+}
+
+start.onclick=function(){
+
+if(!recognition)return;
+
+running=true;
+
+start.disabled=true;
+stop.disabled=false;
+
+try{
+
+recognition.start();
+
+}catch(e){
+
+setStatus("Toque novamente em Iniciar");
+
+}
+
+};
+
+stop.onclick=function(){
+
+running=false;
+
+if(recognition)recognition.stop();
+
+start.disabled=false;
+stop.disabled=true;
+
+setStatus("Tradução parada");
+
+makeSummary();
+
+};
+
+clear.onclick=function(){
+
+running=false;
+
+if(recognition){
+
+try{
+recognition.stop();
+}catch(e){}
+
+}
+
+originalText="";
+portugueseText=[];
+
+pt.textContent="A tradução aparecerá aqui...";
+es.textContent="O que o pastor falar aparecerá aqui...";
+
+summary.textContent=
+"O resumo será formado conforme a pregação avança.";
+
+start.disabled=false;
+stop.disabled=true;
+
+setStatus("Pronto para começar");
+
+};
+
+</script>
+
+</main>
+</body>
+</html>
